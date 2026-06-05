@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICBM PMP Track — Mock Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0e1a;
+  --surface: #111527;
+  --card: #161c30;
+  --border: #1e2740;
+  --accent: #3b82f6;
+  --accent2: #06b6d4;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e8edf8;
+  --muted: #6b7fa8;
+  --radius: 14px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Sora', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(59,130,246,.12),transparent),radial-gradient(ellipse 50% 40% at 90% 80%,rgba(6,182,212,.07),transparent);pointer-events:none;z-index:0}
+
+/* ── LAYOUT ── */
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+.hidden{display:none!important}
+
+/* ── LOGO / HEADER ── */
+.logo-strip{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;box-shadow:0 0 24px rgba(59,130,246,.35)}
+.logo-text{font-size:1.05rem;font-weight:700;letter-spacing:.04em;color:var(--text)}
+.logo-sub{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;width:100%;max-width:560px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.card h1{font-size:1.6rem;font-weight:700;margin-bottom:.35rem;background:linear-gradient(90deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.card .sub{color:var(--muted);font-size:.9rem;margin-bottom:1.75rem;line-height:1.55}
+
+/* ── FORM ── */
+.field{margin-bottom:1.1rem}
+.field label{display:block;font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+.field input{width:100%;background:#0d1122;border:1.5px solid var(--border);border-radius:9px;padding:.75rem 1rem;color:var(--text);font-family:var(--sans);font-size:.95rem;outline:none;transition:border .2s}
+.field input:focus{border-color:var(--accent)}
+.field input::placeholder{color:#3a4a6a}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.6rem;border-radius:9px;font-family:var(--sans);font-size:.92rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(59,130,246,.3)}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:.5rem 1rem;font-size:.82rem;width:auto}
+.btn-danger{background:rgba(239,68,68,.15);border:1.5px solid rgba(239,68,68,.3);color:var(--red)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-gold{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000}
+
+/* ── QUIZ CONTAINER ── */
+.quiz-wrap{width:100%;max-width:700px}
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+.quiz-meta{font-size:.8rem;color:var(--muted);font-family:var(--mono)}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:4px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s ease}
+
+/* ── TIMER ── */
+.timer-ring-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
+.timer-ring-wrap svg{transform:rotate(-90deg)}
+.timer-circle-bg{fill:none;stroke:var(--border);stroke-width:4}
+.timer-circle{fill:none;stroke:var(--accent2);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .9s linear,stroke .5s}
+.timer-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.95rem;font-weight:700;color:var(--text)}
+.timer-warn .timer-circle{stroke:var(--red)}
+.timer-warn .timer-label{color:var(--red)}
+
+/* ── QUESTION CARD ── */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.q-number{font-family:var(--mono);font-size:.75rem;color:var(--accent);letter-spacing:.08em;margin-bottom:.75rem}
+.q-text{font-size:1.05rem;font-weight:500;line-height:1.65;margin-bottom:1.5rem}
+.options{display:flex;flex-direction:column;gap:.65rem}
+.opt{display:flex;align-items:flex-start;gap:.85rem;padding:.85rem 1rem;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;background:transparent}
+.opt:hover{border-color:var(--accent);background:rgba(59,130,246,.06)}
+.opt.selected{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.opt-key{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--muted);width:20px;flex-shrink:0;padding-top:1px}
+.opt.selected .opt-key{color:var(--accent)}
+.opt-text{font-size:.92rem;line-height:1.5}
+
+/* ── NAVIGATION ── */
+.q-nav{display:flex;justify-content:flex-end;gap:.75rem}
+
+/* ── RESULT ── */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.25rem;width:100%;max-width:560px;text-align:center}
+.score-ring{margin:0 auto 1.5rem;width:120px;height:120px;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-pct{font-size:1.7rem;font-weight:800;font-family:var(--mono)}
+.score-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.perf-badge{display:inline-block;padding:.45rem 1.2rem;border-radius:99px;font-size:.85rem;font-weight:700;margin-bottom:1rem}
+.result-details{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.25rem 0}
+.rd{background:rgba(255,255,255,.03);border-radius:9px;padding:.85rem;border:1px solid var(--border)}
+.rd-val{font-size:1.25rem;font-weight:700;font-family:var(--mono)}
+.rd-key{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+/* ── LOCKOUT ── */
+.lockout-card{background:var(--card);border:1px solid rgba(239,68,68,.25);border-radius:16px;padding:2rem;width:100%;max-width:480px;text-align:center}
+.lockout-icon{font-size:2.5rem;margin-bottom:.75rem}
+.lockout-card h2{font-size:1.25rem;font-weight:700;margin-bottom:.5rem}
+.lockout-card p{font-size:.9rem;color:var(--muted);line-height:1.6}
+.lockout-time{color:var(--gold);font-weight:600;font-family:var(--mono)}
+
+/* ── ADMIN ── */
+.admin-wrap{width:100%;max-width:1100px}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:.75rem}
+.admin-topbar h1{font-size:1.35rem;font-weight:700}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.75rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem}
+.stat-val{font-size:1.9rem;font-weight:800;font-family:var(--mono);background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-key{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.section-title{font-size:.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.85rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:.65rem;margin-bottom:1rem}
+.toolbar input,.toolbar select{background:#0d1122;border:1.5px solid var(--border);border-radius:8px;padding:.55rem .85rem;color:var(--text);font-family:var(--sans);font-size:.82rem;outline:none;transition:border .2s}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--accent)}
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead th{background:#0d1122;padding:.75rem 1rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);white-space:nowrap}
+tbody tr{border-top:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody td{padding:.7rem 1rem;white-space:nowrap}
+tbody tr.pass-row{background:rgba(16,185,129,.06)}
+tbody tr.fail-row{background:rgba(239,68,68,.05)}
+.badge{display:inline-block;padding:.25rem .65rem;border-radius:6px;font-size:.72rem;font-weight:600}
+.badge-pass{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.2)}
+.badge-fail{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border);padding-bottom:.5rem}
+.tab{padding:.55rem 1.1rem;border-radius:8px 8px 0 0;font-size:.82rem;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all .2s}
+.tab.active{background:rgba(59,130,246,.12);color:var(--accent)}
+
+/* ── QUESTION MANAGER ── */
+.qm-list{display:flex;flex-direction:column;gap:.75rem;max-height:65vh;overflow-y:auto;padding-right:.25rem}
+.qm-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.15rem}
+.qm-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.65rem}
+.qm-q{font-size:.88rem;font-weight:500;line-height:1.5;flex:1}
+.qm-actions{display:flex;gap:.35rem;flex-shrink:0}
+.qm-opts{display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
+.qm-opt-row{display:flex;align-items:center;gap:.4rem;padding:.35rem .6rem;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid var(--border);font-size:.78rem}
+.qm-opt-row.correct{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.07)}
+.qm-opt-letter{font-family:var(--mono);font-size:.7rem;color:var(--muted);width:14px;flex-shrink:0}
+
+/* edit modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:560px;padding:1.75rem;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:1.1rem;font-weight:700;margin-bottom:1.25rem}
+.modal .field textarea{width:100%;background:#0d1122;border:1.5px solid var(--border);border-radius:9px;padding:.75rem 1rem;color:var(--text);font-family:var(--sans);font-size:.88rem;outline:none;resize:vertical;min-height:80px}
+.modal .field textarea:focus{border-color:var(--accent)}
+.opt-edit-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.opt-edit-row input[type=text]{flex:1}
+.opt-edit-row input[type=radio]{accent-color:var(--green);width:16px;height:16px;cursor:pointer}
+.modal-btns{display:flex;gap:.65rem;margin-top:1.25rem}
+.modal-btns .btn{width:auto;flex:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .result-details{grid-template-columns:1fr 1fr}
+  .stat-val{font-size:1.5rem}
+  .qm-opts{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LANDING PAGE ══════════════ -->
+<div id="pg-landing" class="page">
+  <div style="margin-bottom:1.5rem;text-align:center">
+    <div class="logo-strip" style="justify-content:center">
+      <div class="logo-icon">📋</div>
+      <div>
+        <div class="logo-text">ICBM PMP Track</div>
+        <div class="logo-sub">Mock Examination</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h1>Start Your Exam</h1>
+    <p class="sub">50 questions · 30 seconds per question · No going back. Enter your details to begin.</p>
+    <div class="field"><label>Full Name</label><input id="inp-name" type="text" placeholder="e.g. Amina Okonkwo" autocomplete="name"/></div>
+    <div class="field"><label>Student ID</label><input id="inp-sid" type="text" placeholder="e.g. ICBM2024-001" autocomplete="off"/></div>
+    <div id="landing-err" style="color:var(--red);font-size:.82rem;margin-bottom:.75rem;display:none"></div>
+    <button class="btn btn-primary" onclick="startExam()">Begin Exam →</button>
+    <button class="btn btn-outline" style="margin-top:.6rem;font-size:.78rem" onclick="showAdminLogin()">Admin Dashboard</button>
+  </div>
+</div>
+
+<!-- ══════════════ LOCKOUT PAGE ══════════════ -->
+<div id="pg-lockout" class="page hidden">
+  <div class="lockout-card">
+    <div class="lockout-icon">🔒</div>
+    <h2>Exam Already Taken</h2>
+    <p>You have already taken this assessment.<br>You can retake it on<br><span class="lockout-time" id="lockout-time"></span></p>
+    <button class="btn btn-outline" style="margin-top:1.25rem" onclick="showPage('pg-landing')">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ PAGE ══════════════ -->
+<div id="pg-quiz" class="page hidden">
+  <div class="quiz-wrap">
+    <div class="quiz-header">
+      <div>
+        <div class="logo-strip"><div class="logo-icon" style="width:32px;height:32px;font-size:.9rem">📋</div><div class="logo-text" style="font-size:.88rem">ICBM PMP Mock Exam</div></div>
+        <div class="quiz-meta" id="quiz-student-label"></div>
+      </div>
+      <div class="timer-ring-wrap" id="timer-ring-wrap">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="timer-circle-bg" cx="28" cy="28" r="24"/>
+          <circle class="timer-circle" id="timer-circle" cx="28" cy="28" r="24" stroke-dasharray="150.796" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-label" id="timer-label">30</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="q-card">
+      <div class="q-number" id="q-number">Question 1 of 50</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-primary btn-sm" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RESULT PAGE ══════════════ -->
+<div id="pg-result" class="page hidden">
+  <div class="result-card">
+    <div class="score-ring">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle fill="none" stroke="var(--border)" stroke-width="8" cx="60" cy="60" r="52"/>
+        <circle id="res-ring" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" cx="60" cy="60" r="52" stroke-dasharray="326.726" stroke-dashoffset="326.726" style="transition:stroke-dashoffset 1s ease,stroke .5s"/>
+      </svg>
+      <div class="score-ring-text">
+        <div class="score-pct" id="res-pct">0%</div>
+        <div class="score-lbl">Score</div>
+      </div>
+    </div>
+    <div class="perf-badge" id="res-badge">—</div>
+    <div class="result-details">
+      <div class="rd"><div class="rd-val" id="res-score">0</div><div class="rd-key">Correct</div></div>
+      <div class="rd"><div class="rd-val" id="res-wrong">0</div><div class="rd-key">Incorrect</div></div>
+    </div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.25rem">Results saved. You may retake this exam after 24 hours.</p>
+    <button class="btn btn-outline btn-sm" style="width:auto;margin:0 auto" onclick="showPage('pg-landing')">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN LOGIN ══════════════ -->
+<div id="pg-admin-login" class="page hidden">
+  <div class="card">
+    <h1>Admin Access</h1>
+    <p class="sub">Enter the administrator password to view results and manage questions.</p>
+    <div class="field"><label>Password</label><input id="inp-admin-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"/></div>
+    <div id="admin-err" style="color:var(--red);font-size:.82rem;margin-bottom:.75rem;display:none"></div>
+    <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+    <button class="btn btn-outline" style="margin-top:.6rem" onclick="showPage('pg-landing')">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN DASHBOARD ══════════════ -->
+<div id="pg-admin" class="page hidden" style="align-items:flex-start">
+  <div class="admin-wrap">
+    <div class="admin-topbar">
+      <div>
+        <div class="logo-strip"><div class="logo-icon" style="width:32px;height:32px;font-size:.9rem">🛡️</div><div class="logo-text">Admin Dashboard</div></div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:2px">ICBM PMP Track Mock Exam</div>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-sm btn-gold" onclick="downloadCSV()">⬇ CSV</button>
+        <button class="btn btn-sm btn-outline" onclick="adminLogout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tab-results',this)">Results</button>
+      <button class="tab" onclick="switchTab('tab-questions',this)">Question Manager</button>
+    </div>
+
+    <!-- Results Tab -->
+    <div id="tab-results">
+      <div class="toolbar">
+        <input type="text" id="search-input" placeholder="🔍  Search name or ID…" oninput="renderTable()" style="flex:1;min-width:180px"/>
+        <input type="date" id="date-from" onchange="renderTable()"/>
+        <input type="date" id="date-to" onchange="renderTable()"/>
+        <button class="btn btn-sm btn-outline" onclick="clearFilters()">Clear</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Student ID</th><th>Score</th><th>%</th><th>Performance</th><th>Date &amp; Time</th>
+          </tr></thead>
+          <tbody id="results-tbody"></tbody>
+        </table>
+      </div>
+      <p id="no-results" style="text-align:center;padding:2rem;color:var(--muted);font-size:.85rem;display:none">No records match your filters.</p>
+    </div>
+
+    <!-- Questions Tab -->
+    <div id="tab-questions" class="hidden">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">＋ Add Question</button>
+      </div>
+      <div class="qm-list" id="qm-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ EDIT/ADD MODAL ══════════════ -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modal-title">Edit Question</h3>
+    <div class="field">
+      <label>Question Text</label>
+      <textarea id="modal-qtext" rows="3"></textarea>
+    </div>
+    <div style="margin-bottom:.6rem">
+      <label style="font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Options (select ● for correct answer)</label>
+    </div>
+    <div id="modal-opts-wrap"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" onclick="saveModal()">Save</button>
+      <button class="btn btn-outline" onclick="document.getElementById('modal-overlay').classList.add('hidden')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG — change these easily
+// ═══════════════════════════════════════════════
+const ADMIN_PASSWORD = "icbm2024admin"; // ← Change admin password here
+const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/REPLACE_WITH_YOUR_APPS_SCRIPT_WEBHOOK_URL/exec"; // ← Paste your Apps Script Web App URL here
+const PASS_THRESHOLD = 60; // % to pass
+const TIMER_SECONDS = 30;
+const RETAKE_HOURS = 24;
+
+// ═══════════════════════════════════════════════
+// QUESTION BANK (50 Questions)
+// ═══════════════════════════════════════════════
+let QUESTIONS = [
+  {q:"Which of the following BEST describes a project?",opts:["An ongoing operation that repeats daily","A temporary endeavor that creates a unique result","A permanent functional department","A routine business process"],correct:1},
+  {q:"Which is the BEST example of operations rather than a project?",opts:["Building a new campus app","Running a one-time career fair","Processing payroll every month","Launching a new product line"],correct:2},
+  {q:"Outputs of one process most often become the ______ of a subsequent process.",opts:["Tools","Techniques","Inputs","Constraints"],correct:2},
+  {q:"In the ITTO model, an interview used to gather requirements is best classified as a:",opts:["Input","Tool or technique","Output","Constraint"],correct:1},
+  {q:"Which is a project CONSTRAINT rather than a deliverable?",opts:["The finished mobile wallet","A fixed NGN 12,000,000 budget","The training manual","The signed charter"],correct:1},
+  {q:"The five process groups, in logical order, are:",opts:["Planning, Initiating, Executing, Closing, M&C","Initiating, Planning, Executing, Monitoring & Controlling, Closing","Initiating, Executing, Planning, Closing, M&C","Planning, Executing, Initiating, M&C, Closing"],correct:1},
+  {q:"Monitoring & Controlling processes primarily run:",opts:["Only after the project is executed","Only during initiation","Alongside execution, throughout the project","Only at closing"],correct:2},
+  {q:"A 'progressively elaborated' plan means the plan is:",opts:["Finished completely before any work begins","Refined and detailed as more is known","Never written down","Created only by the sponsor"],correct:1},
+  {q:"A project that defines all requirements up front and executes them sequentially uses which life cycle?",opts:["Adaptive (agile)","Iterative","Predictive (waterfall)","Incremental"],correct:2},
+  {q:"A team delivers a small working increment, collects feedback, and refines it next cycle. This is MOST characteristic of:",opts:["Predictive","Adaptive (agile)","A functional structure","Closing"],correct:1},
+  {q:"Which factor MOST favors a predictive (waterfall) approach?",opts:["Requirements are clear and stable","Requirements change frequently","High uncertainty about the solution","Constant customer feedback loops"],correct:0},
+  {q:"Building a hospital with fixed, well-known requirements is BEST suited to which approach?",opts:["Adaptive (agile)","Predictive (waterfall)","Pure iterative prototyping","Ad hoc"],correct:1},
+  {q:"In an adaptive (agile) life cycle, scope is BEST described as:",opts:["Fixed at the start","Evolving and refined over iterations","Never defined","Set only by the sponsor"],correct:1},
+  {q:"An incremental life cycle delivers the product by:",opts:["Releasing it all at once at the end","Adding functioning pieces successively","Skipping planning entirely","Avoiding customer feedback"],correct:1},
+  {q:"Which is a key advantage of an adaptive approach in uncertain projects?",opts:["Less need for any planning","Early and frequent value delivery with feedback","Guaranteed fixed scope","No need for stakeholders"],correct:1},
+  {q:"A 'hybrid' life cycle means the project:",opts:["Uses only predictive methods","Uses only agile methods","Combines predictive and adaptive elements","Has no life cycle"],correct:2},
+  {q:"In which organizational structure does the project manager have the LEAST authority?",opts:["Projectized","Strong matrix","Functional","Balanced matrix"],correct:2},
+  {q:"In a projectized organization, team members primarily report to:",opts:["The functional manager","The project manager","Two managers equally","The PMO director only"],correct:1},
+  {q:"In which structure is authority shared roughly equally between the functional and project managers?",opts:["Functional","Weak matrix","Balanced matrix","Projectized"],correct:2},
+  {q:"In a weak matrix, the role coordinating the project often has the title:",opts:["Project manager with full authority","Expeditor or coordinator","Functional director","Sponsor"],correct:1},
+  {q:"A primary DISADVANTAGE of a functional structure for projects is:",opts:["The PM has too much authority","Team members may prioritize functional work over the project","No functional expertise is available","There is no management at all"],correct:1},
+  {q:"In a matrix organization, a common challenge for team members is:",opts:["Having no manager","Reporting to two managers (dual reporting)","Never being assigned work","Having unlimited authority"],correct:1},
+  {q:"Where does the project manager generally have the MOST authority?",opts:["Functional","Weak matrix","Balanced matrix","Projectized"],correct:3},
+  {q:"A PMO (Project Management Office) primarily exists to:",opts:["Replace the project manager","Standardize and support project governance and practices","Eliminate the need for planning","Act as the project sponsor"],correct:1},
+  {q:"A PM is pressured to report 200 attendees when only 145 attended. The PM should:",opts:["Report 200 to satisfy management","Report the accurate figure and explain the variance","Refuse to file any report","Report a compromise number"],correct:1},
+  {q:"A vendor privately offers the PM a gift to approve an inflated invoice. This primarily tests which value?",opts:["Respect","Fairness and responsibility","Speed of delivery","Tailoring"],correct:1},
+  {q:"The four values of the PMI Code of Ethics are:",opts:["Speed, cost, scope, quality","Responsibility, respect, fairness, honesty","Planning, executing, monitoring, closing","Power, interest, influence, authority"],correct:1},
+  {q:"A PM realizes they have a conflict of interest on a procurement decision. They should:",opts:["Hide it to avoid trouble","Disclose it and recuse themselves as appropriate","Approve quickly before anyone notices","Blame the vendor"],correct:1},
+  {q:"Treating team members and stakeholders with courtesy and listening to their views reflects which value?",opts:["Respect","Speed","Tailoring","Procurement"],correct:0},
+  {q:"Taking ownership of a mistake you made on the project reflects which value?",opts:["Responsibility","Fairness","Respect","Honesty"],correct:0},
+  {q:"A PM is asked to conceal a known safety risk to keep the schedule. The ethical action is to:",opts:["Conceal it to protect the timeline","Report the risk truthfully and address it","Delay reporting until after launch","Quietly ignore it"],correct:1},
+  {q:"Reporting project status truthfully — good news and bad — reflects which value?",opts:["Honesty","Speed","Respect","Tailoring"],correct:0},
+  {q:"Which BEST captures the spirit of stewardship/responsibility?",opts:["Do the right thing only when audited","Do the right thing even when nobody is watching","Maximize personal benefit","Follow orders without question"],correct:1},
+  {q:"Which document formally authorizes the project and empowers the project manager?",opts:["Project management plan","Project charter","Scope statement","Stakeholder register"],correct:1},
+  {q:"A stakeholder requests a change mid-project. What should the PM do FIRST?",opts:["Implement it immediately","Reject it to protect the baseline","Assess its impact through integrated change control","Escalate to the sponsor at once"],correct:2},
+  {q:"Which process integrates all subsidiary plans and baselines into one document?",opts:["Develop Project Charter","Develop Project Management Plan","Direct and Manage Project Work","Close Project or Phase"],correct:1},
+  {q:"Work performance DATA is transformed into work performance information during:",opts:["Direct and Manage Project Work","Monitor and Control Project Work","Develop Project Charter","Close Project or Phase"],correct:1},
+  {q:"Capturing lessons learned and obtaining final acceptance occurs in which process?",opts:["Develop Project Charter","Direct and Manage Project Work","Close Project or Phase","Perform Integrated Change Control"],correct:2},
+  {q:"Approved change requests are an OUTPUT of which process?",opts:["Develop Project Management Plan","Perform Integrated Change Control","Direct and Manage Project Work","Validate Scope"],correct:1},
+  {q:"Who typically signs and issues the project charter?",opts:["The project manager","The project sponsor","The team lead","The customer's lawyer"],correct:1},
+  {q:"The deliverables of the project are produced primarily during which process?",opts:["Develop Project Charter","Direct and Manage Project Work","Close Project or Phase","Perform Integrated Change Control"],correct:1},
+  {q:"A change is approved through integrated change control. What happens next?",opts:["Nothing further is required","The project management plan and baselines are updated","The charter is rewritten","The project is closed"],correct:1},
+  {q:"The lowest level of the Work Breakdown Structure (WBS) is a:",opts:["Deliverable","Work package","Milestone","Activity"],correct:1},
+  {q:"Uncontrolled, unapproved expansion of project scope is called:",opts:["Gold plating","Scope creep","Progressive elaboration","Rolling wave planning"],correct:1},
+  {q:"The team voluntarily adds features the customer never requested. This is:",opts:["Scope creep","Gold plating","Validate scope","Define scope"],correct:1},
+  {q:"Formal acceptance of completed deliverables by the customer occurs during:",opts:["Control Quality","Validate Scope","Define Scope","Control Scope"],correct:1},
+  {q:"Which is BEST for gathering quick input from a large number of stakeholders?",opts:["One-on-one interviews","Focus groups","Surveys / questionnaires","Expert judgment"],correct:2},
+  {q:"The scope baseline consists of the scope statement, the WBS, and the:",opts:["Project charter","WBS dictionary","Requirements management plan","Stakeholder register"],correct:1},
+  {q:"A document detailing deliverables, acceptance criteria, and exclusions is the:",opts:["Project charter","Project scope statement","Stakeholder register","Risk register"],correct:1},
+  {q:"A WBS is BEST described as:",opts:["A schedule of dates and durations","A deliverable-oriented breakdown of project work","A list of stakeholders","A budget forecast"],correct:1}
+];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let currentStudent = {name:'', sid:''};
+let currentQIndex = 0;
+let answers = [];
+let shuffledQ = [];
+let timerInterval = null;
+let timeLeft = TIMER_SECONDS;
+let adminLoggedIn = false;
+let editingQIndex = null; // null = adding new
+
+// ═══════════════════════════════════════════════
+// PAGES
+// ═══════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function showAdminLogin(){showPage('pg-admin-login');}
+
+// ═══════════════════════════════════════════════
+// EXAM FLOW
+// ═══════════════════════════════════════════════
+function startExam(){
+  const name = document.getElementById('inp-name').value.trim();
+  const sid  = document.getElementById('inp-sid').value.trim();
+  const err  = document.getElementById('landing-err');
+  if(!name||!sid){err.textContent='Please enter your full name and student ID.';err.style.display='block';return;}
+  err.style.display='none';
+
+  // Check 24h lockout
+  const key = `attempt_${sid.toLowerCase()}`;
+  const prev = JSON.parse(localStorage.getItem(key)||'null');
+  if(prev){
+    const next = new Date(prev.ts + RETAKE_HOURS*3600*1000);
+    if(Date.now() < next.getTime()){
+      document.getElementById('lockout-time').textContent = formatDate(next);
+      showPage('pg-lockout');
+      return;
+    }
+  }
+
+  currentStudent = {name,sid};
+  currentQIndex = 0;
+  answers = [];
+  shuffledQ = [...QUESTIONS];
+  document.getElementById('quiz-student-label').textContent = `${name} · ${sid}`;
+  showPage('pg-quiz');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = shuffledQ[currentQIndex];
+  document.getElementById('q-number').textContent = `Question ${currentQIndex+1} of ${shuffledQ.length}`;
+  document.getElementById('q-text').textContent = q.q;
+  const pct = (currentQIndex/shuffledQ.length)*100;
+  document.getElementById('progress-fill').style.width = pct+'%';
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML='';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((o,i)=>{
+    const div = document.createElement('div');
+    div.className='opt';
+    div.innerHTML=`<span class="opt-key">${letters[i]}</span><span class="opt-text">${o}</span>`;
+    div.onclick=()=>selectOpt(i);
+    opts.appendChild(div);
+  });
+
+  document.getElementById('btn-next').disabled = true;
+  startTimer();
+}
+
+function selectOpt(i){
+  document.querySelectorAll('.opt').forEach((o,idx)=>{
+    o.classList.toggle('selected',idx===i);
+  });
+  answers[currentQIndex] = i;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = TIMER_SECONDS;
+  updateTimerUI();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerUI();
+    if(timeLeft<=0){clearInterval(timerInterval);autoAdvance();}
+  },1000);
+}
+
+function updateTimerUI(){
+  const lbl = document.getElementById('timer-label');
+  const circle = document.getElementById('timer-circle');
+  const wrap = document.getElementById('timer-ring-wrap');
+  const circumference = 150.796;
+  const offset = circumference - (timeLeft/TIMER_SECONDS)*circumference;
+  circle.style.strokeDashoffset = offset;
+  lbl.textContent = timeLeft;
+  wrap.classList.toggle('timer-warn', timeLeft<=8);
+}
+
+function autoAdvance(){
+  if(answers[currentQIndex]===undefined) answers[currentQIndex]=-1;
+  nextQuestion();
+}
+
+function nextQuestion(){
+  clearInterval(timerInterval);
+  if(answers[currentQIndex]===undefined) answers[currentQIndex]=-1;
+  currentQIndex++;
+  if(currentQIndex>=shuffledQ.length){submitExam();return;}
+  renderQuestion();
+}
+
+function submitExam(){
+  clearInterval(timerInterval);
+  let correct = 0;
+  shuffledQ.forEach((q,i)=>{if(answers[i]===q.correct)correct++;});
+  const total = shuffledQ.length;
+  const pct   = Math.round((correct/total)*100);
+  const passed = pct>=PASS_THRESHOLD;
+  const label  = perfLabel(pct);
+  const ts     = Date.now();
+
+  // Save attempt
+  const key = `attempt_${currentStudent.sid.toLowerCase()}`;
+  localStorage.setItem(key,JSON.stringify({ts}));
+
+  // Append to results list
+  const results = JSON.parse(localStorage.getItem('exam_results')||'[]');
+  const entry = {name:currentStudent.name,sid:currentStudent.sid,correct,total,pct,passed,label,ts};
+  results.push(entry);
+  localStorage.setItem('exam_results',JSON.stringify(results));
+
+  // Post to Google Sheets
+  postToSheets(entry);
+
+  showResult(correct, total, pct, label, passed);
+}
+
+function showResult(correct, total, pct, label, passed){
+  document.getElementById('res-pct').textContent = pct+'%';
+  document.getElementById('res-score').textContent = correct;
+  document.getElementById('res-wrong').textContent = total-correct;
+  const badge = document.getElementById('res-badge');
+  badge.textContent = label;
+  badge.style.background = passed ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.12)';
+  badge.style.color = passed ? '#34d399' : '#f87171';
+  badge.style.border = `1px solid ${passed?'rgba(16,185,129,.25)':'rgba(239,68,68,.2)'}`;
+
+  const ring = document.getElementById('res-ring');
+  const circumference = 326.726;
+  const offset = circumference - (pct/100)*circumference;
+  ring.style.stroke = passed ? 'var(--green)' : 'var(--red)';
+  setTimeout(()=>{ring.style.strokeDashoffset = offset;},100);
+
+  showPage('pg-result');
+}
+
+function perfLabel(pct){
+  if(pct>=90) return 'Superb';
+  if(pct>=80) return 'Excellent';
+  if(pct>=70) return 'Pass — Well Done';
+  if(pct>=60) return 'Almost There — Keep Pushing';
+  if(pct>=50) return 'Fair — More Effort Needed';
+  if(pct>=40) return 'Below Average — Review Required';
+  return 'Needs Significant Improvement';
+}
+
+// ═══════════════════════════════════════════════
+// GOOGLE SHEETS
+// ═══════════════════════════════════════════════
+async function postToSheets(entry){
+  try{
+    await fetch(GOOGLE_SHEET_WEBHOOK,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...entry, dateTime: formatDate(new Date(entry.ts))})
+    });
+  }catch(e){console.warn('Sheets post failed:',e);}
+}
+
+// ═══════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════
+function adminLogin(){
+  const pw = document.getElementById('inp-admin-pw').value;
+  const err = document.getElementById('admin-err');
+  if(pw!==ADMIN_PASSWORD){err.textContent='Incorrect password.';err.style.display='block';return;}
+  err.style.display='none';
+  document.getElementById('inp-admin-pw').value='';
+  adminLoggedIn=true;
+  loadAdmin();
+  showPage('pg-admin');
+}
+
+function adminLogout(){adminLoggedIn=false;showPage('pg-landing');}
+
+function loadAdmin(){
+  renderStats();
+  renderTable();
+  renderQMList();
+}
+
+function renderStats(){
+  const results = JSON.parse(localStorage.getItem('exam_results')||'[]');
+  const unique = new Set(results.map(r=>r.sid)).size;
+  const passed = results.filter(r=>r.passed).length;
+  const avg = results.length ? Math.round(results.reduce((s,r)=>s+r.pct,0)/results.length) : 0;
+  const grid = document.getElementById('stat-grid');
+  grid.innerHTML = [
+    {val:results.length,key:'Total Attempts'},
+    {val:unique,key:'Unique Students'},
+    {val:passed,key:'Passed'},
+    {val:results.length-passed,key:'Failed'},
+    {val:avg+'%',key:'Average Score'},
+  ].map(s=>`<div class="stat-card"><div class="stat-val">${s.val}</div><div class="stat-key">${s.key}</div></div>`).join('');
+}
+
+function renderTable(){
+  const results = JSON.parse(localStorage.getItem('exam_results')||'[]');
+  const q = (document.getElementById('search-input').value||'').toLowerCase();
+  const df = document.getElementById('date-from').value;
+  const dt = document.getElementById('date-to').value;
+  let filtered = results.filter(r=>{
+    const matchQ = !q||(r.name.toLowerCase().includes(q)||r.sid.toLowerCase().includes(q));
+    const d = new Date(r.ts);
+    const matchFrom = !df||(d >= new Date(df));
+    const matchTo   = !dt||(d <= new Date(dt+'T23:59:59'));
+    return matchQ&&matchFrom&&matchTo;
+  });
+  filtered.sort((a,b)=>b.ts-a.ts);
+  const tbody = document.getElementById('results-tbody');
+  document.getElementById('no-results').style.display = filtered.length?'none':'block';
+  tbody.innerHTML = filtered.map((r,i)=>`
+    <tr class="${r.passed?'pass-row':'fail-row'}">
+      <td style="color:var(--muted);font-family:var(--mono)">${filtered.length-i}</td>
+      <td style="font-weight:600">${esc(r.name)}</td>
+      <td style="font-family:var(--mono);font-size:.78rem">${esc(r.sid)}</td>
+      <td style="font-family:var(--mono)">${r.correct}/${r.total}</td>
+      <td style="font-family:var(--mono);font-weight:700">${r.pct}%</td>
+      <td><span class="badge ${r.passed?'badge-pass':'badge-fail'}">${esc(r.label)}</span></td>
+      <td style="color:var(--muted);font-size:.78rem">${formatDate(new Date(r.ts))}</td>
+    </tr>`).join('');
+}
+
+function clearFilters(){
+  document.getElementById('search-input').value='';
+  document.getElementById('date-from').value='';
+  document.getElementById('date-to').value='';
+  renderTable();
+}
+
+function downloadCSV(){
+  const results = JSON.parse(localStorage.getItem('exam_results')||'[]');
+  const rows=[['Name','Student ID','Score','Total','Percentage','Performance','Date & Time']];
+  results.sort((a,b)=>b.ts-a.ts).forEach(r=>{
+    rows.push([r.name,r.sid,r.correct,r.total,r.pct+'%',r.label,formatDate(new Date(r.ts))]);
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='icbm_pmp_results.csv';a.click();
+}
+
+// ═══════════════════════════════════════════════
+// QUESTION MANAGER
+// ═══════════════════════════════════════════════
+function renderQMList(){
+  const letters=['A','B','C','D'];
+  const wrap = document.getElementById('qm-list');
+  wrap.innerHTML = QUESTIONS.map((q,qi)=>`
+    <div class="qm-item">
+      <div class="qm-item-top">
+        <div class="qm-q"><span style="font-family:var(--mono);color:var(--accent);font-size:.75rem">Q${qi+1}.</span> ${esc(q.q)}</div>
+        <div class="qm-actions">
+          <button class="btn btn-sm btn-outline" style="padding:.3rem .7rem;font-size:.75rem" onclick="openEditModal(${qi})">✏️</button>
+          <button class="btn btn-sm btn-danger" style="padding:.3rem .7rem;font-size:.75rem" onclick="deleteQuestion(${qi})">🗑</button>
+        </div>
+      </div>
+      <div class="qm-opts">
+        ${q.opts.map((o,oi)=>`
+          <div class="qm-opt-row${oi===q.correct?' correct':''}">
+            <span class="qm-opt-letter">${letters[oi]}</span>
+            <span style="font-size:.78rem">${esc(o)}</span>
+            ${oi===q.correct?'<span style="color:var(--green);font-size:.7rem;margin-left:auto">✓</span>':''}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function openEditModal(qi){
+  editingQIndex=qi;
+  const q=QUESTIONS[qi];
+  document.getElementById('modal-title').textContent=`Edit Question ${qi+1}`;
+  document.getElementById('modal-qtext').value=q.q;
+  renderModalOpts(q.opts,q.correct);
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function openAddModal(){
+  editingQIndex=null;
+  document.getElementById('modal-title').textContent='Add New Question';
+  document.getElementById('modal-qtext').value='';
+  renderModalOpts(['','','',''],0);
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function renderModalOpts(opts,correct){
+  const letters=['A','B','C','D'];
+  document.getElementById('modal-opts-wrap').innerHTML=opts.map((o,i)=>`
+    <div class="opt-edit-row">
+      <span style="font-family:var(--mono);font-size:.75rem;color:var(--muted);width:16px">${letters[i]}</span>
+      <input type="text" id="opt-text-${i}" value="${esc(o)}" placeholder="Option ${letters[i]}" class="field input" style="background:#0d1122;border:1.5px solid var(--border);border-radius:8px;padding:.55rem .85rem;color:var(--text);font-family:var(--sans);font-size:.85rem;outline:none;width:100%"/>
+      <input type="radio" name="correct-opt" value="${i}" ${i===correct?'checked':''}/>
+    </div>`).join('');
+}
+
+function saveModal(){
+  const qtext=document.getElementById('modal-qtext').value.trim();
+  if(!qtext){alert('Please enter a question.');return;}
+  const opts=[0,1,2,3].map(i=>document.getElementById(`opt-text-${i}`).value.trim());
+  if(opts.some(o=>!o)){alert('Please fill all four options.');return;}
+  const correctEl=document.querySelector('input[name="correct-opt"]:checked');
+  if(!correctEl){alert('Please select the correct answer.');return;}
+  const correct=parseInt(correctEl.value);
+  const entry={q:qtext,opts,correct};
+  if(editingQIndex===null){QUESTIONS.push(entry);}
+  else{QUESTIONS[editingQIndex]=entry;}
+  localStorage.setItem('custom_questions',JSON.stringify(QUESTIONS));
+  document.getElementById('modal-overlay').classList.add('hidden');
+  renderQMList();
+}
+
+function deleteQuestion(qi){
+  if(!confirm(`Delete Question ${qi+1}? This cannot be undone.`))return;
+  QUESTIONS.splice(qi,1);
+  localStorage.setItem('custom_questions',JSON.stringify(QUESTIONS));
+  renderQMList();
+}
+
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.add('hidden');}
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function switchTab(tabId,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['tab-results','tab-questions'].forEach(id=>{
+    document.getElementById(id).classList.toggle('hidden',id!==tabId);
+  });
+  if(tabId==='tab-questions') renderQMList();
+}
+
+// ═══════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════
+function formatDate(d){
+  return d.toLocaleString('en-NG',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Load custom questions if saved
+(function(){
+  const saved=localStorage.getItem('custom_questions');
+  if(saved){try{QUESTIONS=JSON.parse(saved);}catch(e){}}
+})();
+</script>
+</body>
+</html>
